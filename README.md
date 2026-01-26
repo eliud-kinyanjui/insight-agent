@@ -2,7 +2,7 @@
 
 A cloud-native FastAPI service that analyzes customer feedback and provides text insights. This project demonstrates enterprise-grade deployment practices on Google Cloud Platform.
 
-Repo Link: https://github.com/eliud-kinyanjui/insight-agent
+Repo Link: [https://github.com/eliud-kinyanjui/insight-agent](https://github.com/eliud-kinyanjui/insight-agent)
 
 ## Architecture Overview
 
@@ -72,6 +72,7 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
 **Decision**: Deploy on Cloud Run instead of Compute Engine, GKE, or App Engine
 
 **Rationale**:
+
 - **Serverless**: No infrastructure management - automatic scaling from 0 to N instances
 - **Cost-efficient**: Pay only for request processing time, not idle resources
 - **Containerization**: Use standard Docker containers with no vendor lock-in constraints

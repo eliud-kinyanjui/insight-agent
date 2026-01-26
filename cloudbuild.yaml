@@ -45,7 +45,7 @@ steps:
   # Step 3: Lint Terraform
   - name: 'hashicorp/terraform:latest'
     id: lint-terraform
-    entrypoint: bash
+    entrypoint: sh
     args:
       - -c
       - |
