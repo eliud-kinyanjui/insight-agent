@@ -96,15 +96,21 @@ steps:
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 8: Deploy via Terraform
-  - name: 'hashicorp/terraform:latest'
-    id: deploy-terraform
-    entrypoint: sh
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: setup-auth
+    entrypoint: bash
     args:
       - -c
       - |
         echo "Setting up Terraform authentication..."
         gcloud config set auth/impersonate_service_account ${_TERRAFORM_DEPLOYER_SA}
 
+  - name: 'hashicorp/terraform:latest'
+    id: deploy-terraform
+    entrypoint: sh
+    args:
+      - -c
+      - |
         cd terraform
 
         echo "Initializing Terraform..."

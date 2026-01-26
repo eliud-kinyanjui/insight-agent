@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = " insight-agent-pawait-tf-state"
+    bucket = "insight-agent-pawait-tf-state"
     prefix = "terraform/state"
   }
 }
