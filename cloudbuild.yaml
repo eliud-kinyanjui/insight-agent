@@ -166,7 +166,7 @@ substitutions:
   _REPO: insight-agent-artifact-repo
   _SERVICE_NAME: insight-agent
   _IMAGE_NAME: insight-agent
-  _TERRAFORM_DEPLOYER_SA: insight-agent-terraform@insight-agent-pawait.iam.gserviceaccount.com
+  _TERRAFORM_DEPLOYER_SA: cloudrun-deployer@${PROJECT_ID}.iam.gserviceaccount.com
   _ARTIFACT_BUCKET: ${PROJECT_ID}-build-artifacts
 
 # Build timeout
