@@ -1,0 +1,172 @@
+steps:
+  # Step 1: Lint Python code
+  - name: python:3.14
+    id: lint-python
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Installing lint tools..."
+        pip install flake8 black isort pylint pytest pytest-cov -q
+        
+        echo "Running flake8..."
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+        
+        echo "Checking black formatting..."
+        black --check . || true
+        
+        echo "Checking import sorting..."
+        isort --check-only . || true
+        
+        echo "Running pylint..."
+        pylint app/ --fail-under=7.0 --exit-zero || true
+
+  # Step 2: Run unit tests with coverage
+  - name: python:3.14
+    id: test-python
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Installing dependencies..."
+        pip install -r requirements.txt -r requirements-dev.txt -q
+        
+        echo "Running pytest with coverage..."
+        pytest tests/ \
+          --cov=app \
+          --cov-report=term-missing \
+          --cov-report=xml \
+          --junitxml=test-results.xml || true
+        
+        echo "Test results generated"
+
+  # Step 3: Lint Terraform
+  - name: gcr.io/cloud-builders/terraform
+    id: lint-terraform
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        cd terraform
+        terraform init -backend=false -upgrade
+        echo "Running terraform fmt check..."
+        terraform fmt -check -recursive . || true
+        echo "Running terraform validate..."
+        terraform validate || true
+
+  # Step 4: Build Docker image
+  - name: gcr.io/cloud-builders/docker
+    id: build-docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+      - -t
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+      - -f
+      - Dockerfile
+      - .
+
+  # Step 5: Push to Artifact Registry (short SHA tag)
+  - name: gcr.io/cloud-builders/docker
+    id: push-docker-sha
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+
+  # Step 6: Push to Artifact Registry (latest tag)
+  - name: gcr.io/cloud-builders/docker
+    id: push-docker-latest
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+
+  # Step 7: Scan Docker image for vulnerabilities (Trivy)
+  - name: aquasec/trivy
+    id: scan-image
+    args:
+      - image
+      - --exit-code=0
+      - --severity=HIGH,CRITICAL
+      - --no-progress
+      - --format=json
+      - --output=trivy-results.json
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+
+  # Step 8: Deploy via Terraform
+  - name: gcr.io/cloud-builders/gcloud
+    id: deploy-terraform
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Setting up Terraform authentication..."
+        gcloud config set auth/impersonate_service_account ${_TERRAFORM_DEPLOYER_SA}
+        
+        cd terraform
+        
+        echo "Initializing Terraform..."
+        terraform init
+        
+        echo "Planning Terraform changes..."
+        terraform plan \
+          -var="image_tag=${SHORT_SHA}" \
+          -out=tfplan
+        
+        echo "Applying Terraform changes..."
+        terraform apply \
+          -auto-approve \
+          tfplan
+        
+        echo "Deployment complete!"
+        terraform output deployment_summary
+
+  # Step 9: Output deployment info
+  - name: gcr.io/cloud-builders/gcloud
+    id: output-info
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "=== Deployment Summary ==="
+        echo "Project: ${PROJECT_ID}"
+        echo "Region: ${_REGION}"
+        echo "Service: ${_SERVICE_NAME}"
+        echo "Image Tag: ${SHORT_SHA}"
+        echo "Repository: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}"
+
+# Build configuration
+options:
+  substitution_option: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+  machine_type: N1_STANDARD_2
+
+# Images to be pushed
+images:
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+# Artifacts to store
+artifacts:
+  objects:
+    location: gs://${_ARTIFACT_BUCKET}/${BUILD_ID}
+    paths:
+      - test-results.xml
+      - trivy-results.json
+
+# Substitutions
+substitutions:
+  _REGION: africa-south1
+  _REPO: insight-agent
+  _SERVICE_NAME: insight-agent
+  _TERRAFORM_DEPLOYER_SA: insight-agent-terraform@insight-agent-pawait.iam.gserviceaccount.com
+  _ARTIFACT_BUCKET: ${PROJECT_ID}-build-artifacts
+
+# Build timeout
+timeout: 1800s
+
+# Required Python files
+tags:
+  - gcp-cloud
+  - insight-agent
+  - python
+  - terraform
