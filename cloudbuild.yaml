@@ -43,7 +43,7 @@ steps:
         echo "Test results generated"
 
   # Step 3: Lint Terraform
-  - name: gcr.io/cloud-builders/gcloud
+  - name: 'hashicorp/terraform:latest'
     id: lint-terraform
     entrypoint: bash
     args:
@@ -97,7 +97,7 @@ steps:
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 8: Deploy via Terraform
-  - name: gcr.io/cloud-builders/gcloud
+  - name: 'hashicorp/terraform:latest'
     id: deploy-terraform
     entrypoint: bash
     args:
