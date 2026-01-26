@@ -157,7 +157,7 @@ artifacts:
 # Substitutions
 substitutions:
   _REGION: africa-south1
-  _REPO: insight-agent
+  _REPO: insight-agent-artifact-repo
   _SERVICE_NAME: insight-agent
   _IMAGE_NAME: insight-agent
   _TERRAFORM_DEPLOYER_SA: insight-agent-terraform@insight-agent-pawait.iam.gserviceaccount.com

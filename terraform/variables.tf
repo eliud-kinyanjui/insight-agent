@@ -18,11 +18,6 @@ variable "zone" {
   type        = string
 }
 
-variable "gcp_account_key" {
-  description = "Path to the GCP account key JSON file."
-  type        = string
-}
-
 variable "artifact_repo_id" {
   description = "The ID of the Artifact Registry repository."
   type        = string

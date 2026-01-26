@@ -11,6 +11,7 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
 ### Architecture Diagram
 
 ```
+
 ┌─────────────────────────────────────────────────────────────────┐
 │                   [Developer]                                   |
 |                    ↓                                            |
@@ -81,6 +82,7 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
 - **Automatic updates**: Cloud Run maintains the underlying infrastructure
 
 **Trade-offs Considered**:
+
 - Compute Engine: More control but requires manual scaling, patching, and management
 - GKE: Powerful but adds complexity for a simple microservice
 - App Engine: Limited language support and flexibility compared to Cloud Run
@@ -90,6 +92,7 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
 **Multi-layered Security Approach**:
 
 #### Service Accounts & IAM
+
 - **Principle of Least Privilege**: Separate service accounts for:
   - **Cloud Run Runtime SA**: Only permissions to pull container images
   - **Terraform Deployer SA**: Deploy and manage infrastructure
@@ -97,16 +100,17 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
 - Each SA has minimal required permissions scoped to specific resources
 
 #### Container Security
+
 - **Non-root user**: Application runs as `appuser` (UID 1000) in the container
 - **Read-only filesystem**: Minimizes attack surface
 - **Artifact Registry**: Private registry - images stored securely, not in public Docker Hub
 - **Image scanning**: Trivy scans all built images for HIGH and CRITICAL vulnerabilities
 
 #### Deployment Security
+
 - **Terraform impersonation**: Cloud Build impersonates a specific SA with deployment rights
 - **Image tagging**: Deployments use specific SHA tags, not "latest", for reproducibility
 - **Audit logging**: All IAM changes and deployments logged in Cloud Audit Logs
-
 
 ### 3. CI/CD Pipeline Architecture
 
@@ -152,15 +156,17 @@ The Insight Agent is built on a modern, scalable cloud-native architecture lever
    - Integrated with Cloud Build UI for visibility
 
 **Trigger Strategy**:
+
 - Pipeline triggered on every commit to main branch
 - Manual trigger option for other branches/hotfixes
 - Supports canary deployments via image tag override
 
-
 ## Setup and Deployment Instructions
 
 ### Prerequisites
+
 Before starting, ensure you have:
+
 - **GCP Project** with billing enabled
 - **gcloud CLI** installed and authenticated
 - **Terraform** >= 1.0
@@ -310,6 +316,7 @@ pytest tests/test_main.py::TestHealthEndpoint -v
 ```
 
 **Test Coverage**:
+
 - ✅ Health check endpoint
 - ✅ Text analysis with various inputs (empty strings, unicode, special characters)
 - ✅ Validation error handling
@@ -344,6 +351,7 @@ SERVICE_URL=$(gcloud run services describe insight-agent \
 curl -X POST $SERVICE_URL/analyze \
   -H "Content-Type: application/json" \
   -d '{"text":"Test feedback"}'
+```
 
 ### Troubleshooting Setup Issues
 
@@ -355,18 +363,22 @@ curl -X POST $SERVICE_URL/analyze \
 | Cloud Run can't pull image | Verify service account has `artifactregistry.reader` role |
 | Health check fails | Check container logs: `gcloud run logs read insight-agent` |
 
-
 ## Logging & Monitoring
+
 All application logs are automatically captured by Cloud Run and sent to Cloud Logging:
 
 **Log Collection**:
+
 - FastAPI framework logs (requests, errors)
 - stdout/stderr from the application
 - Structured logs via Python logging module (recommended for production)
 
 ### Monitoring and Metrics
+
 #### Built-in Cloud Run Metrics
+
 Cloud Run automatically exposes metrics in Cloud Monitoring
 
 ### Health Checks
+
 The application includes a dedicated health check endpoint (`/health`) that Cloud Run uses.
