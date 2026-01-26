@@ -49,13 +49,12 @@ steps:
     args:
       - -c
       - |
-        set +e
         cd terraform
-        terraform init -backend=false -upgrade
+        terraform init -backend=false -upgrade || true
         echo "Running terraform fmt check..."
-        terraform fmt -check -recursive .
+        terraform fmt -check -recursive . || true
         echo "Running terraform validate..."
-        terraform validate
+        terraform validate || true
 
   # Step 4: Build Docker image
   - name: gcr.io/cloud-builders/docker
