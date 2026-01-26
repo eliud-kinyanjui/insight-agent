@@ -43,7 +43,7 @@ steps:
         echo "Test results generated"
 
   # Step 3: Lint Terraform
-  - name: gcr.io/cloud-builders/terraform
+  - name: 'hashicorp/terraform:1.0.0'
     id: lint-terraform
     entrypoint: bash
     args:
