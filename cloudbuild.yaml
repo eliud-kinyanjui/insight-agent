@@ -60,9 +60,9 @@ steps:
     args:
       - build
       - -t
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
       - -t
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest
       - -f
       - Dockerfile
       - .
@@ -72,14 +72,14 @@ steps:
     id: push-docker-sha
     args:
       - push
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 6: Push to Artifact Registry (latest tag)
   - name: gcr.io/cloud-builders/docker
     id: push-docker-latest
     args:
       - push
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest
 
   # Step 7: Scan Docker image for vulnerabilities (Trivy)
   - name: aquasec/trivy
@@ -91,7 +91,7 @@ steps:
       - --no-progress
       - --format=json
       - --output=trivy-results.json
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
+      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 8: Deploy via Terraform
   - name: gcr.io/cloud-builders/gcloud
@@ -133,7 +133,7 @@ steps:
         echo "Region: ${_REGION}"
         echo "Service: ${_SERVICE_NAME}"
         echo "Image Tag: ${SHORT_SHA}"
-        echo "Repository: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}"
+        echo "Repository: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}"
 
 # Build configuration
 options:
@@ -142,8 +142,8 @@ options:
 
 # Images to be pushed
 images:
-  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:${SHORT_SHA}
-  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${IMAGE_NAME}:latest
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
+  - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest
 # Artifacts to store
 artifacts:
   objects:
