@@ -6,6 +6,7 @@ gcp_account_key           = "./terraform_account_key.json"
 artifact_repo_id          = "insight-agent-artifact-repo"
 artifact_repo_description = "Artifact repository for Insight Agent"
 image_tag                = "latest"
+service_account_email     = "cloudrun-runtime@insight-agent-pawait.iam.gserviceaccount.com"
 cloud_run_service_name    = "insight-agent"
 container_port           = 8080
 min_instances            = 1

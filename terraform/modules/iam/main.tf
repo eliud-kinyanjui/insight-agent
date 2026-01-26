@@ -22,6 +22,7 @@ resource "google_project_iam_member" "cloudrun_deployer_roles" {
     "roles/iam.serviceAccountUser",       # Act as service accounts
     "roles/artifactregistry.writer",      # Push/pull images to Artifact Registry
     "roles/artifactregistry.repoAdmin",   # Manage Artifact Registry repositories
+    "roles/logging.logWriter",              # Write logs
   ])
 
   project = var.project_id
