@@ -43,18 +43,19 @@ steps:
         echo "Test results generated"
 
   # Step 3: Lint Terraform
-  - name: 'hashicorp/terraform:1.0.0'
+  - name: gcr.io/cloud-builders/gcloud
     id: lint-terraform
     entrypoint: bash
     args:
       - -c
       - |
+        set +e
         cd terraform
         terraform init -backend=false -upgrade
         echo "Running terraform fmt check..."
-        terraform fmt -check -recursive . || true
+        terraform fmt -check -recursive .
         echo "Running terraform validate..."
-        terraform validate || true
+        terraform validate
 
   # Step 4: Build Docker image
   - name: gcr.io/cloud-builders/docker
