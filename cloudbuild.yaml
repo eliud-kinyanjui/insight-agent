@@ -98,7 +98,7 @@ steps:
   # Step 8: Deploy via Terraform
   - name: 'hashicorp/terraform:latest'
     id: deploy-terraform
-    entrypoint: bash
+    entrypoint: sh
     args:
       - -c
       - |
