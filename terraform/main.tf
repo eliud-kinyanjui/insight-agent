@@ -26,11 +26,11 @@ module "gcp_apis" {
 
 # Storage Module - for Terraform state backend
 module "storage" {
-  source     = "./modules/storage"
-  project_id = var.project_id
-  region     = var.region
-  bucket_name = "${var.project_id}-tf-state"
-  deployer_service_account_email  = module.iam.deployer_service_account_email
+  source                         = "./modules/storage"
+  project_id                     = var.project_id
+  region                         = var.region
+  bucket_name                    = "${var.project_id}-tf-state"
+  deployer_service_account_email = module.iam.deployer_service_account_email
 }
 
 # Artifact Registry

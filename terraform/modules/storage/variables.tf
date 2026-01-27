@@ -10,7 +10,7 @@ variable "region" {
 
 variable "bucket_name" {
   description = "gcs bucket name"
-  type = string
+  type        = string
 }
 
 variable "deployer_service_account_email" {

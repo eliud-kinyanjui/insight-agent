@@ -42,7 +42,7 @@ variable "service_account_email" {
 
 variable "cloud_run_service_name" {
   description = "Cloud Run service name"
-  type        = string  
+  type        = string
 }
 
 variable "container_port" {

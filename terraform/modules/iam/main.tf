@@ -18,11 +18,11 @@ resource "google_service_account" "cloudrun_runtime" {
 # IAM roles for deployer service account
 resource "google_project_iam_member" "cloudrun_deployer_roles" {
   for_each = toset([
-    "roles/run.admin",                    # Manage Cloud Run services
-    "roles/iam.serviceAccountUser",       # Act as service accounts
-    "roles/artifactregistry.writer",      # Push/pull images to Artifact Registry
-    "roles/artifactregistry.repoAdmin",   # Manage Artifact Registry repositories
-    "roles/logging.logWriter",              # Write logs
+    "roles/run.admin",                  # Manage Cloud Run services
+    "roles/iam.serviceAccountUser",     # Act as service accounts
+    "roles/artifactregistry.writer",    # Push/pull images to Artifact Registry
+    "roles/artifactregistry.repoAdmin", # Manage Artifact Registry repositories
+    "roles/logging.logWriter",          # Write logs
   ])
 
   project = var.project_id
@@ -33,8 +33,8 @@ resource "google_project_iam_member" "cloudrun_deployer_roles" {
 # IAM roles for runtime service account (minimal permissions)
 resource "google_project_iam_member" "cloudrun_runtime_roles" {
   for_each = toset([
-    "roles/logging.logWriter",      # Write logs
-    "roles/cloudtrace.agent",       # Send traces
+    "roles/logging.logWriter",       # Write logs
+    "roles/cloudtrace.agent",        # Send traces
     "roles/monitoring.metricWriter", # Write metrics
   ])
 
