@@ -110,7 +110,7 @@ steps:
         echo "Initializing Terraform..."
         terraform init \
           -backend-config="bucket=${_TERRAFORM_STATE_BUCKET}" \
-          -backend-config="prefix=terraform/state" \
+          -backend-config="prefix=terraform/state/prod" \
           -upgrade
 
         echo "Planning Terraform changes..."
@@ -163,16 +163,12 @@ substitutions:
   _REPO: insight-agent-artifact-repo
   _SERVICE_NAME: insight-agent
   _IMAGE_NAME: insight-agent
-  _TERRAFORM_DEPLOYER_SA: cloudrun-deployer@${PROJECT_ID}.iam.gserviceaccount.com
   _ARTIFACT_BUCKET: ${PROJECT_ID}-build-artifacts
   _TERRAFORM_STATE_BUCKET: insight-agent-pawait-tf-state
 
 # Build timeout
 timeout: 1800s
 
-# Required Python files
-tags:
-  - gcp-cloud
+tags:  
   - insight-agent
-  - python
   - terraform

@@ -13,6 +13,11 @@ variable "bucket_name" {
   type        = string
 }
 
+variable "artifacts_bucket_name" {
+  description = "GCS bucket name for build artifacts"
+  type        = string
+}
+
 variable "deployer_service_account_email" {
   description = "Email of the Cloud Build/Terraform deployer service account"
   type        = string

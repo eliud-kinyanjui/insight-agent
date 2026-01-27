@@ -8,7 +8,7 @@ terraform {
 
   backend "gcs" {
     bucket = "insight-agent-pawait-tf-state"
-    prefix = "terraform/state"
+    prefix = "terraform/state/prod"
   }
 }
 
@@ -30,6 +30,7 @@ module "storage" {
   project_id                     = var.project_id
   region                         = var.region
   bucket_name                    = "${var.project_id}-tf-state"
+  artifacts_bucket_name          = "${var.project_id}-build-artifacts"
   deployer_service_account_email = module.iam.deployer_service_account_email
 }
 
