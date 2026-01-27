@@ -79,19 +79,12 @@ steps:
       - Dockerfile
       - .
 
-  # Step 5: Push to Artifact Registry (short SHA tag)
+  # Step 5: Push to Artifact Registry (short SHA & latest tag)
   - name: gcr.io/cloud-builders/docker
     id: push-docker-sha
     args:
       - push
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
-
-  # Step 6: Push to Artifact Registry (latest tag)
-  - name: gcr.io/cloud-builders/docker
-    id: push-docker-latest
-    args:
-      - push
-      - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest
 
   # Step 7: Scan Docker image for vulnerabilities (Trivy)
   - name: aquasec/trivy
@@ -106,15 +99,6 @@ steps:
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 8: Deploy via Terraform
-  - name: "gcr.io/cloud-builders/gcloud"
-    id: setup-auth
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        echo "Setting up Terraform authentication..."
-        gcloud config set auth/impersonate_service_account ${_TERRAFORM_DEPLOYER_SA}
-
   - name: "hashicorp/terraform:1.10"
     id: deploy-terraform
     entrypoint: sh
@@ -124,7 +108,10 @@ steps:
         cd terraform
 
         echo "Initializing Terraform..."
-        terraform init
+        terraform init \
+          -backend-config="bucket=${_TERRAFORM_STATE_BUCKET}" \
+          -backend-config="prefix=terraform/state" \
+          -upgrade
 
         echo "Planning Terraform changes..."
         terraform plan \
@@ -178,6 +165,7 @@ substitutions:
   _IMAGE_NAME: insight-agent
   _TERRAFORM_DEPLOYER_SA: cloudrun-deployer@${PROJECT_ID}.iam.gserviceaccount.com
   _ARTIFACT_BUCKET: ${PROJECT_ID}-build-artifacts
+  _TERRAFORM_STATE_BUCKET: insight-agent-pawait-tf-state
 
 # Build timeout
 timeout: 1800s
