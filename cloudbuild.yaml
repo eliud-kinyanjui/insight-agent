@@ -43,18 +43,28 @@ steps:
         echo "Test results generated"
 
   # Step 3: Lint Terraform
-  - name: 'hashicorp/terraform:latest'
+  - name: "hashicorp/terraform:1.10"
     id: lint-terraform
     entrypoint: sh
     args:
       - -c
       - |
+        set -e
         cd terraform
-        terraform init -backend=false -upgrade || true
+
+        echo "Initializing Terraform..."
+        terraform init -backend=false -upgrade
+
         echo "Running terraform fmt check..."
-        terraform fmt -check -recursive . || true
+        if ! terraform fmt -check -recursive .; then
+          echo "Formatting issues found. Run 'terraform fmt -recursive' locally."
+          exit 1
+        fi
+
         echo "Running terraform validate..."
-        terraform validate || true
+        terraform validate
+
+        echo "All Terraform lint checks passed"
 
   # Step 4: Build Docker image
   - name: gcr.io/cloud-builders/docker
@@ -96,7 +106,7 @@ steps:
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:${SHORT_SHA}
 
   # Step 8: Deploy via Terraform
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: "gcr.io/cloud-builders/gcloud"
     id: setup-auth
     entrypoint: bash
     args:
@@ -105,7 +115,7 @@ steps:
         echo "Setting up Terraform authentication..."
         gcloud config set auth/impersonate_service_account ${_TERRAFORM_DEPLOYER_SA}
 
-  - name: 'hashicorp/terraform:latest'
+  - name: "hashicorp/terraform:1.10"
     id: deploy-terraform
     entrypoint: sh
     args:

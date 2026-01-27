@@ -27,8 +27,7 @@ output "deployment_summary" {
     service_id     = try(module.cloud_run.service_id, "Not deployed")
     
     # Artifact Registry
-    artifact_repo  = module.artifact_registry.repository_name
-    image_full_path = module.artifact_registry.image_full_path
+    image_full_path = "${module.artifact_registry.repository_url}/${var.cloud_run_service_name}:${var.image_tag}"
     
     # Service Accounts
     deployer_sa    = try(module.iam.cloudrun_deployer_email, "Not created")
