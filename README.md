@@ -228,7 +228,7 @@ Create or update `terraform/terraform.tfvars`:
 **Local Terraform (One-time Setup)**:
 
 ```bash
-cd terraform
+cd deploy/terraform
 
 # Initialize Terraform (downloads provider plugins, creates .terraform/)
 terraform init
@@ -279,6 +279,7 @@ gcloud builds connect --repository-name=insight-agent --repository-owner=your-or
 **Build and run locally**:
 
 ```bash
+cd src
 # Build Docker image
 docker build -t insight-agent:test .
 
@@ -299,6 +300,7 @@ curl http://localhost:8080/health
 The project includes a comprehensive test suite with 94% code coverage.
 
 ```bash
+cd src
 # Install dev dependencies
 pip install -r requirements-dev.txt
 

@@ -6,6 +6,7 @@ steps:
     args:
       - -c
       - |
+        cd src
         echo "Installing lint tools..."
         python -m venv .venv && source .venv/bin/activate
         pip install flake8 black isort pylint pytest pytest-cov -q
@@ -20,7 +21,7 @@ steps:
         isort --check-only . || true
 
         echo "Running pylint..."
-        pylint app/ --fail-under=7.0 --exit-zero || true
+        pylint . --fail-under=7.0 --exit-zero || true
 
   # Step 2: Run unit tests with coverage
   - name: python:3.14
@@ -29,13 +30,14 @@ steps:
     args:
       - -c
       - |
+        cd src
         echo "Installing dependencies..."
         python -m venv .venv && source .venv/bin/activate
         pip install -r requirements.txt -r requirements-dev.txt -q
 
         echo "Running pytest with coverage..."
         pytest tests/ \
-          --cov=app \
+          --cov=. \
           --cov-report=term-missing \
           --cov-report=xml \
           --junitxml=test-results.xml || true
@@ -50,7 +52,7 @@ steps:
       - -c
       - |
         set -e
-        cd terraform
+        cd deploy/terraform
 
         echo "Initializing Terraform..."
         terraform init -backend=false -upgrade
@@ -76,8 +78,8 @@ steps:
       - -t
       - ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_IMAGE_NAME}:latest
       - -f
-      - Dockerfile
-      - .
+      - src/Dockerfile
+      - src
 
   # Step 5: Push to Artifact Registry (short SHA & latest tag)
   - name: gcr.io/cloud-builders/docker
@@ -105,7 +107,7 @@ steps:
     args:
       - -c
       - |
-        cd terraform
+        cd deploy/terraform
 
         echo "Initializing Terraform..."
         terraform init \
@@ -154,7 +156,7 @@ artifacts:
   objects:
     location: gs://${_ARTIFACT_BUCKET}/${BUILD_ID}
     paths:
-      - test-results.xml
+      - src/test-results.xml
       - trivy-results.json
 
 # Substitutions

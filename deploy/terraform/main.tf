@@ -24,6 +24,13 @@ module "gcp_apis" {
   project_id = var.project_id
 }
 
+# IAM Module - manage IAM roles and permissions
+module "iam" {
+  source     = "./modules/iam"
+  project_id = var.project_id
+  depends_on = [module.gcp_apis]
+}
+
 # Storage Module - for Terraform state backend
 module "storage" {
   source                         = "./modules/storage"
@@ -32,6 +39,7 @@ module "storage" {
   bucket_name                    = "${var.project_id}-tf-state"
   artifacts_bucket_name          = "${var.project_id}-build-artifacts"
   deployer_service_account_email = module.iam.deployer_service_account_email
+  depends_on                     = [module.iam]
 }
 
 # Artifact Registry
@@ -43,14 +51,6 @@ module "artifact_registry" {
   description   = var.artifact_repo_description
   depends_on    = [module.gcp_apis]
 }
-
-# IAM Module - manage IAM roles and permissions
-module "iam" {
-  source     = "./modules/iam"
-  project_id = var.project_id
-  depends_on = [module.gcp_apis]
-}
-
 
 # Cloud Run Module - deploy Cloud Run services
 module "cloud_run" {

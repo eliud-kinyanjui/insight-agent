@@ -1,16 +1,51 @@
-# Environments
-.env
-.venv
-
-
-# Python
-__pycache__/
-*.py[cod]
-
+# Env
+.*-env/
+ 
+# Build / distribution / packaging
+.Python
+build/
+dist/
+sdist/
+var/
+target/
+*.egg-info/
+pip-log.txt
+pip-delete-this-directory.txt
+ 
+# Byte-compiled / optimized / DLL files
+__pycache__
+.mypy_cache/
+ 
+# Build docs
+docs/_build/
+docs/vendor/
+ 
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+ 
+# Jupyter stuff
+.ipynb_checkpoints/
+.ipython/
+.cache/
+ 
+# secrets
+*.key
+.gitsecret/keys/random_seed
 
 # Terraform
-.terraform/
 *.tfstate
 *.tfstate.backup
+*.tfplan
 .terraform.lock.hcl
-tfplan
+.terraform/
+override.tf
+*_override.tf
+.terraformrc
+terraform.rc
