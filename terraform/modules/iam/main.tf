@@ -18,11 +18,11 @@ resource "google_service_account" "cloudrun_runtime" {
 # IAM roles for deployer service account
 resource "google_project_iam_member" "cloudrun_deployer_roles" {
   for_each = toset([
-    "roles/run.admin",                  # Manage Cloud Run services
-    "roles/iam.serviceAccountUser",     # Act as service accounts
-    "roles/artifactregistry.repoAdmin", # Manage Artifact Registry repositories
-    "roles/logging.logWriter",          # Write logs
-    "roles/storage.admin",              # Manage GCS buckets/objects
+    "roles/run.admin",                      # Manage Cloud Run services
+    "roles/iam.serviceAccountUser",         # Act as service accounts
+    "roles/artifactregistry.repoAdmin",     # Manage Artifact Registry repositories
+    "roles/logging.logWriter",              # Write logs
+    "roles/storage.admin",                  # Manage GCS buckets/objects
     "roles/serviceusage.serviceUsageAdmin", # Enable/disable APIs (for terraform)
   ])
 
