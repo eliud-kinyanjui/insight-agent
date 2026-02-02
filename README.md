@@ -1,5 +1,4 @@
-# Insight Agent - PawaIT Assessment
-
+# Insight Agent
 A cloud-native FastAPI service that analyzes customer feedback and provides text insights. This project demonstrates enterprise-grade deployment practices on Google Cloud Platform.
 
 Repo Link: [https://github.com/eliud-kinyanjui/insight-agent](https://github.com/eliud-kinyanjui/insight-agent)
